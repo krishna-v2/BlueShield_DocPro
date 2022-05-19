@@ -1,0 +1,12 @@
+numpy
+pandas
+sklearn
+opencv-python
+tensorflow==2.5
+openpyxl
+pillow
+matplotlib
+google.cloud
+google-cloud-vision
+tqdm
+pyside2

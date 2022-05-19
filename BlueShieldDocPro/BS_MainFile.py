@@ -17,34 +17,34 @@ from PIL import Image, ImageDraw
 import tensorflow as tf
 from tensorflow.keras.models import load_model
 from openpyxl.workbook import Workbook
-
+from cnfg import Cnfg
 
 from BS_AlignForm import align, cropped_from_aligned
 from BS_TextExtractor import FindText
 from BS_Checkbox import checkbox_predict
 
 
-class BlueShield():
-
+class BlueShield:
     def __init__(self, template_type):
-        if template_type == 'brc_template1':
-            base_folder = r'C:\Users\Krishna Sahoo\Documents\Python Venv\BlueShield\BS_Demo'
-            temp_folder = r'C:\Users\Krishna Sahoo\Documents\Python Venv\BlueShield\BS_Demo\temp'
-            template_file = join(r'C:\Users\Krishna Sahoo\Documents\Python Venv\BlueShield\BS_Demo\onboarding\BRC_Template1', 
-                'brc_template.png')
+        p = Cnfg()
+        base_folder = p.base_folder
+        temp_folder = p.temp_folder
 
-        address_pos = {'hs':190, 'he':371, 'ws':432, 'we':1288}
-        barcode_pos = {'hs':351, 'he':421, 'ws':423, 'we':1270}
-        email_pos = {'hs':518, 'he':589, 'ws':826, 'we':1700}
-        phone_pos = {'hs':470, 'he':520, 'ws':620, 'we':1395}
-        s = 27
-        checkbox_pos = {'hs': 502-s*3, 'he': 502+s*3, 'ws':488-s, 'we':488+s}
+        if template_type == 'brc_template1':
+            template_file = p.template_file1
+            address_pos = p.address_pos1
+            barcode_pos = p.barcode_pos1
+            email_pos = p.email_pos1
+            phone_pos = p.phone_pos1
+            checkbox_pos = p.checkbox_pos1
+
         pos_dict = {'address': address_pos, 
                     'barcode': barcode_pos,
                     'email': email_pos,
                     'phone': phone_pos,
                     'checkbox': checkbox_pos}
-        canvas = np.full((606,904), 255, dtype = np.uint8)
+
+        canvas = np.full(p.canvas_shape, 255, dtype=np.uint8)
 
         checkbox_model = load_model('checkbox_model.h5')
         # eraseline_model = load_model('erase_lines.h5')
@@ -64,8 +64,8 @@ class BlueShield():
         #eraseline_model = self.eraseline_model
 
         # Align the source images with template
-        template = cv2.imread(template_file, 1)
-        img = cv2.imread(file_path, cv2.IMREAD_GRAYSCALE)
+        template = cv2.imread(str(template_file), 1)
+        img = cv2.imread(str(file_path), cv2.IMREAD_GRAYSCALE)
         matrix = align(template, img)
         res = cv2.warpPerspective(img, matrix, (template.shape[1], template.shape[0]))
         sections = cropped_from_aligned(res, self.pos_dict)
@@ -83,7 +83,9 @@ class BlueShield():
             canvas[offset_h : offset_h+h, offset_w : offset_w+w] = img1
             offset_h = offset_h + h + 100
         path = join(self.temp_folder, 'canvas', 'canvas' + '_' + basename(file_path))
+        print(path)
         cv2.imwrite(path, canvas)
+
         obj = FindText(path)
         result_dict = obj.extract_address()
         result_dict['phone'] = obj.extract_phone()
@@ -149,6 +151,11 @@ class BlueShield():
         result.to_excel(data)
         data.save()
 
-    def save_result():
+    def save_result(self):
         pass
 
+if __name__ == '__main__':
+    docpro = BlueShield('brc_template1')
+    file = r'C:\Users\vinee\source\repos\BlueShield_DocPro\filled_forms\8_filled.png'
+    data = docpro.extract_data(file)
+    print(data)

@@ -9,6 +9,7 @@ from PIL import Image, ImageDraw
 import matplotlib.pyplot as plt
 from enum import Enum
 from google.cloud import vision
+from typing import Tuple
 
 
 # In[3]:
@@ -65,6 +66,16 @@ class FindText():
         self.bounds = bounds
         self.document = document
 
+    @staticmethod
+    def vertices_to_box(v1, v2, v3, v4) -> Tuple: #[left, right, bot, top]
+        xs = [i.x for i in [v1, v2, v3, v4]]
+        ys = [i.y for i in [v1, v2, v3, v4]]
+        left = min(xs)
+        right = max(xs)
+        bot = min(ys)
+        top = max(ys)
+        return left, right, bot, top
+
     def extract_address(self, flag=0):
         bounds = self.bounds
         ID = ''
@@ -76,10 +87,10 @@ class FindText():
                 for paragraph in block.paragraphs:
                     for word in paragraph.words:
                         for symbol in word.symbols:
-                            min_x=min(symbol.bounding_box.vertices[0].x,symbol.bounding_box.vertices[1].x,symbol.bounding_box.vertices[2].x,symbol.bounding_box.vertices[3].x)
-                            max_x=max(symbol.bounding_box.vertices[0].x,symbol.bounding_box.vertices[1].x,symbol.bounding_box.vertices[2].x,symbol.bounding_box.vertices[3].x)
-                            min_y=min(symbol.bounding_box.vertices[0].y,symbol.bounding_box.vertices[1].y,symbol.bounding_box.vertices[2].y,symbol.bounding_box.vertices[3].y)
-                            max_y=max(symbol.bounding_box.vertices[0].y,symbol.bounding_box.vertices[1].y,symbol.bounding_box.vertices[2].y,symbol.bounding_box.vertices[3].y)
+                            min_x, max_x, min_y, max_y = self.vertices_to_box(symbol.bounding_box.vertices[0],
+                                                                              symbol.bounding_box.vertices[1],
+                                                                              symbol.bounding_box.vertices[2],
+                                                                              symbol.bounding_box.vertices[3])
                             
                             if(min_x >= bounds[flag].vertices[0].x-20 and max_x <= bounds[flag].vertices[2].x+20 and min_y >= bounds[flag].vertices[0].y-10 and max_y <= bounds[flag].vertices[0].y+40):
                                 ID += symbol.text
@@ -115,10 +126,11 @@ class FindText():
                 for paragraph in block.paragraphs:
                     for word in paragraph.words:
                         for symbol in word.symbols:
-                            min_x=min(symbol.bounding_box.vertices[0].x,symbol.bounding_box.vertices[1].x,symbol.bounding_box.vertices[2].x,symbol.bounding_box.vertices[3].x)
-                            max_x=max(symbol.bounding_box.vertices[0].x,symbol.bounding_box.vertices[1].x,symbol.bounding_box.vertices[2].x,symbol.bounding_box.vertices[3].x)
-                            min_y=min(symbol.bounding_box.vertices[0].y,symbol.bounding_box.vertices[1].y,symbol.bounding_box.vertices[2].y,symbol.bounding_box.vertices[3].y)
-                            max_y=max(symbol.bounding_box.vertices[0].y,symbol.bounding_box.vertices[1].y,symbol.bounding_box.vertices[2].y,symbol.bounding_box.vertices[3].y)
+                            min_x, max_x, min_y, max_y = self.vertices_to_box(symbol.bounding_box.vertices[0],
+                                                                              symbol.bounding_box.vertices[1],
+                                                                              symbol.bounding_box.vertices[2],
+                                                                              symbol.bounding_box.vertices[3])
+
                             if(min_x >= bounds[-1].vertices[0].x-20 and max_x <= bounds[-1].vertices[2].x+20 and min_y >= bounds[0].vertices[2].y+20 and max_y <= bounds[-1].vertices[0].y-20):
                                 text += symbol.text
         return text
@@ -140,7 +152,10 @@ class FindText():
         return text
 
 
-
+if __name__ == '__main__':
+    img_path = r'C:\Users\vinee\source\repos\BlueShield_DocPro\filled_forms\1_filled.png'
+    find_text = FindText(img_path)
+    find_text.extract_phone()
 
 
 
