@@ -34,7 +34,7 @@ class BlueShieldDocProcUI(QtWidgets.QMainWindow):
         h, w = img.shape
         pixmap = QPixmap(fpath)
         if h > w:
-            pixmap = pixmap.scaled(1200, 600, QtCore.Qt.KeepAspectRatio)
+            pixmap = pixmap.scaled(2000, 1000, QtCore.Qt.KeepAspectRatio)
         else:
             pixmap = pixmap.scaled(800, 400, QtCore.Qt.KeepAspectRatio)
         self.ui.img.setPixmap(pixmap)
