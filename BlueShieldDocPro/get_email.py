@@ -102,8 +102,14 @@ def doc_to_symbols(document, pos, pcts):
                                  'center': center}
                             if symbol.property.detected_break.type == 1:
                                 d['space'] = True
+                            if symbol.property.detected_break.type in [3, 5]:
+                                d['newline'] = True
+
                             symbols[pct].append(d)
+
         return symbols
+
+
 
 
 def find_top_2_symbols_by_len(symbols):

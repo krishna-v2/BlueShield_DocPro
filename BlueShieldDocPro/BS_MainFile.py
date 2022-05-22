@@ -16,6 +16,7 @@ import tensorflow as tf
 from tensorflow.keras.models import load_model
 from openpyxl.workbook import Workbook
 from BlueShieldDocPro.cnfg import Cnfg
+from pyzbar.pyzbar import decode
 
 from BlueShieldDocPro.BS_AlignForm import align, cropped_from_aligned
 from BlueShieldDocPro.BS_TextExtractor import find_text
@@ -93,10 +94,15 @@ class BlueShield:
         email, count_score, char_scores = extract_email(self.canvas)
         result_dict['email_canvas'] = {'email': email, 'count_score': count_score, 'char_scores': char_scores}
 
+        # extract barcode data
+        barcode = decode(sections['barcode'])[0].data[:12].decode()
+        result_dict['barcode'] = barcode
+
+
         return result_dict
 
 if __name__ == '__main__':
     docpro = BlueShield('brc_template1')
-    file = r'C:\Users\vinee\source\repos\BlueShield_DocPro\filled_forms\12.png'
+    file = r'C:\Users\vinee\source\repos\BlueShield_DocPro\filled_forms\1_filled.png'
     data = docpro.extract_data(file)
     print(data)

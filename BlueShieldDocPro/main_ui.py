@@ -52,12 +52,13 @@ class BlueShieldDocProcUI(QtWidgets.QMainWindow):
             return
         r = self.docpro.extract_data(file)
 
-        res = '\n'.join([f'ID: {r["ID"]}',
+        res = '\n'.join([f'ID: {r["ID"]}', '\n',
                          f'Name: {r["name"]}',
                          f'Address: {r["address"]}',
-                         f'Phone: {r["phone"]}',
+                         f'barcode: {r["barcode"]}', '\n',
+                         f'Phone: {r["phone"]}', '\n',
                          f'Email: {r["email_canvas"]["email"]}',
-                         f'Email Score: {r["email_canvas"]["count_score"]:.2f}',
+                         f'Email Score: {r["email_canvas"]["count_score"]:.2f}', '\n',
                          f'Mail Checkbox: {self.label_to_ans(r["mail_checkbox"])}',
                          f'Phone Checkbox: {self.label_to_ans(r["phone_checkbox"])}',
                          f'Email Checkbox: {self.label_to_ans(r["email_checkbox"])}'])

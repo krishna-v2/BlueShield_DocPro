@@ -117,6 +117,9 @@ def extract_text_helper(document):
                             words[kind].append(word)
 
     for kind in kinds:
+        if kind in ['phone', 'email']:
+            words[kind] = sorted(words[kind], key=lambda x: x.bounding_box.vertices[0].x)
+
         words[kind] = check_list_overlap(words[kind])
 
     # Collect symbols from each word found
@@ -157,6 +160,6 @@ def extract_text_helper(document):
 
 
 if __name__ == '__main__':
-    img_path = r'C:\Users\vinee\source\repos\BlueShield_DocPro\temp\canvas\canvas_18.png'
+    img_path = r'C:\Users\vinee\source\repos\BlueShield_DocPro\temp\canvas\canvas_16.png'
     text = find_text(img_path)
     print(text)
