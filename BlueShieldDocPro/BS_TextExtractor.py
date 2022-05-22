@@ -1,6 +1,9 @@
 #!/usr/bin/env python
 # coding: utf-8
 
+import sys
+from os.path import dirname
+sys.path.append(dirname(__file__))
 
 import os
 import io
@@ -10,7 +13,7 @@ import matplotlib.pyplot as plt
 from enum import Enum
 from google.cloud import vision
 from typing import Tuple
-from cnfg import Cnfg
+from BlueShieldDocPro.cnfg import Cnfg
 import tensorflow as tf
 import numpy as np
 
@@ -25,7 +28,7 @@ class FeatureType(Enum):
     SYMBOL = 5
 
 
-def find_text(image_path):
+def find_text(image_path, document_only=False):
     # calling up google vision json file
     os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = r'neutron-345122-39e5256f7765.json'
 
@@ -40,6 +43,8 @@ def find_text(image_path):
     image_detail = vision.Image(content=file_content)
     response = client.document_text_detection(image=image_detail, image_context={"language_hints": ["en"]})
     document = response.full_text_annotation
+    if document_only:
+        return document
 
     return extract_text_helper(document)
 
@@ -52,6 +57,9 @@ def intersect(tl, tr, br, bl, canvs_pos):
     rw = max(xs)
     tw = min(ys)
     bw = max(ys)
+
+    lw = max(0, lw)
+    tw = max(0, tw)
 
     lc = canvs_pos['canvas_w_offset'] # left of box in canvas
     rc = lc + canvs_pos['we'] - canvs_pos['ws']
@@ -72,7 +80,7 @@ def intersect(tl, tr, br, bl, canvs_pos):
     return area_overlap / area_word
 
 def check_list_overlap(words):
-    if len(words) == 1:
+    if len(words) < 2:
         return words
 
     boxes = []
@@ -139,7 +147,7 @@ def extract_text_helper(document):
     if len(address_lines) > 2:
         text['ID'] = address_lines.pop(0)
         text['name'] = address_lines.pop(0)
-        text['address'] = ''.join(address_lines)
+        text['address'] = '\n'.join(address_lines)
     else:
         raise ValueError("Not enough lines detected in address")
 

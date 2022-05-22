@@ -56,7 +56,8 @@ class BlueShieldDocProcUI(QtWidgets.QMainWindow):
                          f'Name: {r["name"]}',
                          f'Address: {r["address"]}',
                          f'Phone: {r["phone"]}',
-                         f'Email: {r["email"]}',
+                         f'Email: {r["email_canvas"]["email"]}',
+                         f'Email Score: {r["email_canvas"]["count_score"]:.2f}',
                          f'Mail Checkbox: {self.label_to_ans(r["mail_checkbox"])}',
                          f'Phone Checkbox: {self.label_to_ans(r["phone_checkbox"])}',
                          f'Email Checkbox: {self.label_to_ans(r["email_checkbox"])}'])

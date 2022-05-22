@@ -1,5 +1,5 @@
 from pathlib import Path
-
+from os.path import join
 
 class Cnfg:
     base_folder = Path(__file__).parent.parent
@@ -19,7 +19,7 @@ class Cnfg:
                          'canvas_h_offset': phone_offset, 'canvas_w_offset': 197}
 
     email_offset = phone_pos1['canvas_h_offset'] + phone_pos1['he'] - phone_pos1['hs'] + canvas_h_offset
-    email_pos1 = {'hs': 518, 'he': 589, 'ws': 826, 'we': 1700, 'canvas_h_offset': email_offset, 'canvas_w_offset': 0}
+    email_pos1 = {'hs': 518, 'he': 589, 'ws': 826, 'we': 1640, 'canvas_h_offset': email_offset, 'canvas_w_offset': 0}
     barcode_pos1 = {'hs': 351, 'he': 421, 'ws': 423, 'we': 1270}
 
     s = 27
@@ -30,7 +30,10 @@ class Cnfg:
     text_kinds = ['address', 'phone', 'email']
     all_kinds = ['address', 'phone', 'email', 'checkbox', 'barcode']
 
-
+class EmailP:
+    cnfg = Cnfg()
+    pcts = list(range(200, 400, 25))
+    save_folder = join(cnfg.temp_folder, 'email')
 
 if __name__ == '__main__':
     cnfg = Cnfg()
